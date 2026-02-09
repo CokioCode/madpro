@@ -75,29 +75,38 @@ export const RAB_RANGES = [
   { label: "> 100 Jt", min: 100000000, max: 1000000000 },
 ] as const;
 
-interface ApiError {
-  response?: {
-    data?: {
-      message?: string;
-    };
-  };
+type ApiErrorPayload = {
   message?: string;
-}
+};
 
 export function getErrorMessage(
   error: unknown,
-  fallback = "An error occurred",
+  fallback = "an error occurred",
 ): string {
   if (!error) return fallback;
 
-  const apiError = error as ApiError;
+  if (typeof error === "object" && error !== null && "response" in error) {
+    const response = (error as { response?: unknown }).response;
 
-  if (apiError.response?.data?.message) {
-    return apiError.response.data.message;
+    if (
+      typeof response === "object" &&
+      response !== null &&
+      "data" in response
+    ) {
+      const data = (response as { data?: unknown }).data;
+
+      if (
+        typeof data === "object" &&
+        data !== null &&
+        "message" in data &&
+        typeof (data as ApiErrorPayload).message === "string"
+      ) {
+        return (data as ApiErrorPayload).message || "";
+      }
+    }
   }
-
-  if (apiError.message) {
-    return apiError.message;
+  if (error instanceof Error) {
+    return error.message;
   }
 
   return fallback;

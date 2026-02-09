@@ -31,6 +31,7 @@ export enum FormFieldType {
   SELECT = "select",
   SKELETON = "skeleton",
   RANGE_SLIDER = "rangeSlider",
+  HIDDEN = "hidden",
 }
 
 interface CustomProps {
@@ -47,6 +48,8 @@ interface CustomProps {
   renderSkeleton?: (field: any) => React.ReactNode;
   fieldType: FormFieldType;
   type?: React.InputHTMLAttributes<HTMLInputElement>["type"];
+  value?: string;
+  maxLength?: number;
 
   min?: number;
   max?: number;
@@ -80,6 +83,7 @@ const RenderInput = ({ field, props, type }: RenderInputProps) => {
             <Input
               placeholder={props.placeholder}
               type={type ?? "text"}
+              maxLength={props.maxLength}
               {...field}
               className="shad-input border-0"
             />
@@ -210,6 +214,13 @@ const RenderInput = ({ field, props, type }: RenderInputProps) => {
         </FormControl>
       );
 
+    case FormFieldType.HIDDEN:
+      return (
+        <FormControl>
+          <Input type="hidden" {...field} value={props.value ?? field.value} />
+        </FormControl>
+      );
+
     case FormFieldType.SKELETON:
       return props.renderSkeleton ? props.renderSkeleton(field) : null;
 
@@ -227,9 +238,11 @@ export const CustomFormField = (props: CustomProps) => {
       name={name}
       render={({ field }) => (
         <FormItem className="flex-1">
-          {props.fieldType !== FormFieldType.CHECKBOX && label && (
-            <FormLabel className="shad-input-label">{label}</FormLabel>
-          )}
+          {props.fieldType !== FormFieldType.CHECKBOX &&
+            props.fieldType !== FormFieldType.HIDDEN &&
+            label && (
+              <FormLabel className="shad-input-label">{label}</FormLabel>
+            )}
           <RenderInput field={field} type={props.type} props={props} />
 
           <FormMessage className="shad-error" />

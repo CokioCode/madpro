@@ -6,16 +6,20 @@ export const userSchema = z.object({
   id: z.cuid(),
   username: z
     .string()
-    .min(3, "Username minimal 3 karakter")
-    .max(20, "Username maksimal 20 karakter")
-    .regex(/^[a-zA-Z0-9_]+$/, "Username hanya boleh huruf, angka, dan _")
+    .min(3, "Username must be at least 3 characters")
+    .max(20, "Username must be at most 20 characters")
+    .regex(
+      /^[a-zA-Z0-9_]+$/,
+      "Username may only contain letters, numbers, and underscores",
+    )
     .trim(),
 
   name: z
     .string()
-    .min(2, "Nama minimal 2 karakter")
-    .max(50, "Nama maksimal 50 karakter")
+    .min(2, "Name must be at least 2 characters")
+    .max(50, "Name must be at most 50 characters")
     .trim(),
+  email: z.email().min(1),
 
   role: roleEnum,
   lastLoginAt: z.iso.datetime(),
@@ -32,7 +36,7 @@ export const createUserSchema = userSchema
     updatedAt: true,
   })
   .extend({
-    password: z.string().min(3, "Password minimal 3 karakter").max(100),
+    password: z.string().min(3).max(100),
   });
 
 export const updateUserSchema = userSchema

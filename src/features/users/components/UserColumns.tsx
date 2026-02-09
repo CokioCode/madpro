@@ -126,7 +126,7 @@ export const createUserColumns = (
           {formatDateShort(row.original.createdAt)}
         </div>
         <div className="text-xs text-slate-500 mt-1">
-          {getRelativeTime(row.original.createdAt)}
+          {getRelativeTime(row.original.lastLoginAt)}
         </div>
       </div>
     ),

@@ -25,6 +25,7 @@ type MeUser = {
   userId: string;
   username: string;
   role: "ADMIN" | "USER";
+  email: string;
   name: string;
   iat: number;
   exp: number;
@@ -78,7 +79,7 @@ export function NavUser() {
                   {data?.data.name}
                 </span>
                 <span className="truncate text-xs">
-                  {data?.data.username.toLocaleLowerCase()}@telkom.co.id
+                  {data?.data.email.toLocaleLowerCase()}
                 </span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
@@ -104,7 +105,7 @@ export function NavUser() {
                     {data?.data.name}
                   </span>
                   <span className="truncate text-xs">
-                    {data?.data.username.toLocaleLowerCase()}@telkom.co.id
+                    {data?.data.email.toLocaleLowerCase()}
                   </span>
                 </div>
               </div>

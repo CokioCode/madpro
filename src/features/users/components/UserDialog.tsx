@@ -50,6 +50,7 @@ export const UserDialog = ({
           name: "",
           username: "",
           role: "USER",
+          email: "",
           oldPassword: "",
           newPassword: "",
         }
@@ -57,6 +58,7 @@ export const UserDialog = ({
           name: "",
           username: "",
           password: "",
+          email: "",
           role: "USER",
         },
   });
@@ -70,6 +72,7 @@ export const UserDialog = ({
           role: user.role,
           oldPassword: "",
           newPassword: "",
+          email: user.email || "",
         });
       } else {
         form.reset({
@@ -77,6 +80,7 @@ export const UserDialog = ({
           username: "",
           password: "",
           role: "USER",
+          email: "",
         });
       }
     }
@@ -133,6 +137,14 @@ export const UserDialog = ({
                   name="username"
                   label="Username"
                   placeholder="johndoe"
+                />
+
+                <CustomFormField
+                  fieldType={FormFieldType.INPUT}
+                  control={form.control}
+                  name="email"
+                  label="Email"
+                  placeholder="johndoe@gmail.com"
                 />
               </TabsContent>
 
