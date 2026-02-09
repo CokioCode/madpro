@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useGet, usePost } from "@/hooks/useApi";
 import { removeCookie } from "@/lib/utils";
+import { useQueryClient } from "@tanstack/react-query";
 
 type MeUser = {
   userId: string;
@@ -32,6 +33,7 @@ type MeUser = {
 };
 
 export function NavUser() {
+  const queryClient = useQueryClient();
   const { isMobile } = useSidebar();
   const router = useRouter();
 
@@ -45,9 +47,9 @@ export function NavUser() {
     "/auth/logout",
     {
       isAuth: true,
-      invalidateQueries: [["me"]],
       onSuccess: (res) => {
         toast.success(res.message);
+        queryClient.invalidateQueries({ queryKey: ["me"] });
         removeCookie("token");
         router.replace("/login");
       },

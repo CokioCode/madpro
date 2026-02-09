@@ -1,5 +1,6 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -23,6 +24,7 @@ interface LoginResponse {
 
 export const LoginPage = () => {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -38,10 +40,10 @@ export const LoginPage = () => {
     z.infer<typeof loginSchema>
   >("/auth/login", {
     isAuth: false,
-    invalidateQueries: [["users"]],
     onSuccess: (response) => {
       toast.success(response.message);
 
+      queryClient.invalidateQueries({ queryKey: ["users"] });
       if (response.data?.token) {
         setCookie("token", response.data.token);
       }

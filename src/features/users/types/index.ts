@@ -47,14 +47,8 @@ export const updateUserSchema = userSchema
     lastLoginAt: true,
   })
   .extend({
-    oldPassword: z
-      .string()
-      .min(3, "Old password minimal 3 karakter")
-      .optional(),
-    newPassword: z
-      .string()
-      .min(3, "New password minimal 3 karakter")
-      .optional(),
+    oldPassword: z.string().optional().nullable(),
+    newPassword: z.string().optional().nullable(),
   })
   .partial();
 

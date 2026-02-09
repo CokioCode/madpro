@@ -88,14 +88,20 @@ export const UserDialog = ({
 
   const handleSubmit = async (data: CreateUser | UpdateUser) => {
     try {
-      await onSubmit(data);
+      let payload: CreateUser | UpdateUser = data;
+
+      if (isEditMode) {
+        const { oldPassword, newPassword, ...rest } = data as UpdateUser;
+
+        payload =
+          oldPassword && newPassword
+            ? { ...rest, oldPassword, newPassword }
+            : rest;
+      }
+
+      await onSubmit(payload);
       form.reset();
-    } catch (error) {
-      console.error(
-        `Error ${isEditMode ? "updating" : "creating"} user:`,
-        error,
-      );
-    }
+    } catch {}
   };
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>

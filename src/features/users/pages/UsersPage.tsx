@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 import { DeleteDialog } from "@/components/dialog/DeleteDialog";
 import { DataTable } from "@/components/table/DataTable";
 import { createUserColumns } from "@/features/users/components/UserColumns";
@@ -18,6 +19,7 @@ export const UsersPage = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   const pagination = useTablePagination(5);
+  const queryClient = useQueryClient();
 
   const { data, isLoading } = useGet<{
     success: boolean;
@@ -32,9 +34,9 @@ export const UsersPage = () => {
 
   const createUserMutation = usePost<ApiResponse<User>, CreateUser>("/users", {
     isAuth: true,
-    invalidateQueries: [["users"]],
     onSuccess: (res) => {
       toast.success(res.message);
+      queryClient.invalidateQueries({ queryKey: ["users"] });
       handleCloseDialog();
     },
   });
@@ -43,9 +45,9 @@ export const UsersPage = () => {
     `/users/${selectedUser?.id}`,
     {
       isAuth: true,
-      invalidateQueries: [["users"]],
       onSuccess: (res) => {
         toast.success(res.message);
+        queryClient.invalidateQueries({ queryKey: ["users"] });
         handleCloseDialog();
       },
     },
@@ -55,9 +57,9 @@ export const UsersPage = () => {
     `/users/${selectedUser?.id}`,
     {
       isAuth: true,
-      invalidateQueries: [["users"]],
       onSuccess: (res) => {
         toast.success(res.message);
+        queryClient.invalidateQueries({ queryKey: ["users"] });
       },
     },
   );

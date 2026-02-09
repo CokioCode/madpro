@@ -12,6 +12,7 @@ import type { ApiResponse } from "@/types";
 import { createSurveyColumns } from "../components/SurveryCollumn";
 import { SurveyDetailDialog, SurveyDialog } from "../components/SurveyDialog";
 import type { Filter, Survey, UpdateSurvey } from "../types";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface SurveyProps {
   statusJtEnum: string[];
@@ -41,6 +42,7 @@ export const SurveyPage = (props: SurveyProps) => {
   }>(token);
 
   const pagination = useTablePagination(5);
+  const queryClient = useQueryClient();
 
   const buildQueryString = () => {
     const params = new URLSearchParams();
@@ -83,9 +85,9 @@ export const SurveyPage = (props: SurveyProps) => {
     }>
   >("/sync", {
     isAuth: true,
-    invalidateQueries: [["survey"]],
     onSuccess: (res) => {
       toast.success(res.message);
+      queryClient.invalidateQueries({ queryKey: ["survey"] });
     },
   });
 
@@ -93,9 +95,9 @@ export const SurveyPage = (props: SurveyProps) => {
     `/admin/survey/${selectedSurvey?.nomorNcx}`,
     {
       isAuth: true,
-      invalidateQueries: [["survey"]],
       onSuccess: (res) => {
         toast.success(res.message);
+        queryClient.invalidateQueries({ queryKey: ["survey"] });
         handleCloseEditDialog();
       },
     },
@@ -105,9 +107,9 @@ export const SurveyPage = (props: SurveyProps) => {
     `/admin/survey/${selectedSurvey?.nomorNcx}`,
     {
       isAuth: true,
-      invalidateQueries: [["survey"]],
       onSuccess: (res) => {
         toast.success(res.message);
+        queryClient.invalidateQueries({ queryKey: ["survey"] });
       },
     },
   );
