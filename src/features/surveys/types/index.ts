@@ -151,7 +151,6 @@ export const surveySchema = z.object({
 
 export const createSurveySchema = z.object({
   statusJt: z.string().optional(),
-  c2r: z.number().optional(),
   nomorNcx: z.string().optional(),
   alamat: z.string().optional(),
   jenisLayanan: z.string().optional(),

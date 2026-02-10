@@ -41,7 +41,6 @@ export const SurveyDialog = ({
     resolver: zodResolver(updateSurveySchema),
     defaultValues: {
       statusJt: "",
-      c2r: 0,
       nomorNcx: "",
       alamat: "",
       jenisLayanan: "",
@@ -59,7 +58,6 @@ export const SurveyDialog = ({
     if (isOpen && survey) {
       form.reset({
         statusJt: survey.statusJt || "",
-        c2r: survey.c2r || 0,
         nomorNcx: survey.nomorNcx || "",
         alamat: survey.alamat || "",
         jenisLayanan: survey.jenisLayanan || "",
@@ -78,7 +76,6 @@ export const SurveyDialog = ({
     try {
       const submitData = {
         ...data,
-        c2r: Number(data.c2r),
         jarakOdp: Number(data.jarakOdp),
         rabSurvey: Number(data.rabSurvey),
       };
@@ -181,17 +178,6 @@ export const SurveyDialog = ({
                     placeholder="32713900"
                     type="number"
                   />
-
-                  <div className="md:col-span-2">
-                    <CustomFormField
-                      fieldType={FormFieldType.INPUT}
-                      control={form.control}
-                      name="c2r"
-                      label="C2R"
-                      placeholder="39.16"
-                      type="number"
-                    />
-                  </div>
                 </div>
               </TabsContent>
 
