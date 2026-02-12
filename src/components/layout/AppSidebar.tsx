@@ -38,10 +38,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarMenuButton size="lg" asChild>
               <div className="flex items-center gap-2">
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <span className="text-xs font-bold">ST</span>
+                  <span className="text-xs font-bold">MP</span>
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">Survey Tracker</span>
+                  <span className="truncate font-semibold">MadPro Hub</span>
                   <span className="truncate text-xs">
                     {!mounted || !decoded
                       ? "Panel"

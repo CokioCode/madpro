@@ -36,9 +36,9 @@ const AuthLayouts = (props: AuthInterface) => {
       </div>
 
       <div className="relative hidden lg:block overflow-hidden">
-        <div className="absolute inset-0 bg-linear-to-br from-primary/90 to-chart-2/90 z-10" />
+        <div className="absolute inset-0 bg-linear-to-br from-primary/70 to-chart-2/90 z-10" />
         <Image
-          src="/images/login.jpg"
+          src="/images/login.jpeg"
           alt="Image"
           className="absolute inset-0 10 h-full w-full object-cover"
           priority
@@ -47,14 +47,15 @@ const AuthLayouts = (props: AuthInterface) => {
         />
         <div className="absolute inset-0 z-20 flex flex-col items-center justify-center p-10 text-primary-foreground">
           <div className="max-w-2xl space-y-8 text-center">
-            <div className="space-y-4">
-              <h2 className="text-4xl font-bold tracking-tight">
-                Survey & Issue Tracker
-              </h2>
-              <p className="text-xl leading-relaxed opacity-95">
-                Streamline your workflow with our comprehensive survey and issue
-                tracking platform. Monitor feedback, track problems, and resolve
-                issues efficiently—all in one place.
+            <div className="space-y-5">
+              <div className="space-y-1">
+                <h1 className="text-4xl font-bold tracking-tight">MadPro</h1>
+              </div>
+
+              <p className="text-xl leading-relaxed max-w-xl">
+                Madiun B2B Project Dashboard — a centralized platform to monitor
+                progress, manage collaboration, and keep every project under
+                control with clarity and precision.
               </p>
             </div>
 
