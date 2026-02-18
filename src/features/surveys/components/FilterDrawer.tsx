@@ -20,7 +20,6 @@ import {
 } from "@/components/ui/drawer";
 import { Form } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
-import { SelectItem } from "@/components/ui/select";
 import { formatCurrency, RAB_RANGES } from "@/lib/utils";
 import { buildFilterSchema, type Filter } from "../types";
 
@@ -40,7 +39,6 @@ export const FilterDrawer = (props: FilterDrawerProps) => {
     defaultValues: {
       rabHldMin: "",
       rabHldMax: "",
-      statusJt: "ALL",
       sto: "",
       tahun: "",
     },
@@ -54,7 +52,7 @@ export const FilterDrawer = (props: FilterDrawerProps) => {
     const emptyFilter: Filter = {
       rabHldMin: "",
       rabHldMax: "",
-      statusJt: "ALL",
+      statusJt: [],
       sto: "",
       tahun: "",
     };
@@ -116,16 +114,14 @@ export const FilterDrawer = (props: FilterDrawerProps) => {
               <CustomFormField
                 control={form.control}
                 name="statusJt"
-                fieldType={FormFieldType.SELECT}
+                fieldType={FormFieldType.MULTISELECT}
                 label="Status JT"
                 placeholder="Pilih status"
-              >
-                {props.statusJtEnum.map((status: string) => (
-                  <SelectItem key={status} value={status}>
-                    {status.replaceAll("_", " ")}
-                  </SelectItem>
-                ))}
-              </CustomFormField>
+                options={props.statusJtEnum.map((status) => ({
+                  value: status,
+                  label: status.replaceAll("_", " "),
+                }))}
+              />
 
               <div className="space-y-3">
                 <Label className="text-sm font-medium">RAB HILD Range</Label>

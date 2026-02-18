@@ -20,6 +20,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Check, ChevronsUpDown, X } from "lucide-react";
+import { ScrollArea } from "../ui/scroll-area";
 
 export enum FormFieldType {
   INPUT = "input",
@@ -32,6 +48,13 @@ export enum FormFieldType {
   SKELETON = "skeleton",
   RANGE_SLIDER = "rangeSlider",
   HIDDEN = "hidden",
+  MULTISELECT = "multiselect", // ← baru
+}
+
+// ─── MultiSelect option type ──────────────────────────────────────────────────
+export interface MultiSelectOption {
+  value: string;
+  label: string;
 }
 
 interface CustomProps {
@@ -55,8 +78,132 @@ interface CustomProps {
   max?: number;
   step?: number;
   formatLabel?: (value: number | undefined) => string;
+
+  // MultiSelect props
+  options?: MultiSelectOption[];
+  maxSelect?: number;
 }
 
+// ─── MultiSelect Internal Component ──────────────────────────────────────────
+interface MultiSelectInputProps {
+  options: MultiSelectOption[];
+  value: string[];
+  onChange: (val: string[]) => void;
+  placeholder?: string;
+  disabled?: boolean;
+  maxSelect?: number;
+}
+
+const MultiSelectInput = ({
+  options,
+  value = [],
+  onChange,
+  placeholder = "Pilih opsi...",
+  disabled = false,
+  maxSelect,
+}: MultiSelectInputProps) => {
+  const [open, setOpen] = useState(false);
+
+  const toggle = (val: string) => {
+    if (value.includes(val)) {
+      onChange(value.filter((v) => v !== val));
+    } else {
+      if (maxSelect && value.length >= maxSelect) return;
+      onChange([...value, val]);
+    }
+  };
+
+  const remove = (val: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    onChange(value.filter((v) => v !== val));
+  };
+
+  const selectedOptions = options.filter((o) => value.includes(o.value));
+
+  return (
+    <Popover open={open} onOpenChange={disabled ? undefined : setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          type="button"
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          disabled={disabled}
+          className="shad-input w-full justify-between h-auto min-h-10 font-normal border-dark-500 bg-dark-400 text-left"
+        >
+          <div className="flex flex-wrap gap-1 flex-1">
+            {selectedOptions.length === 0 ? (
+              <span className="text-muted-foreground">{placeholder}</span>
+            ) : (
+              selectedOptions.map((item) => (
+                <Badge
+                  key={item.value}
+                  variant="secondary"
+                  className="flex items-center gap-1 pr-1"
+                >
+                  {item.label}
+                  <span
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter")
+                        remove(item.value, e as unknown as React.MouseEvent);
+                    }}
+                    onClick={(e) => remove(item.value, e)}
+                    className="ml-1 rounded-full hover:bg-muted-foreground/20 p-0.5 cursor-pointer"
+                  >
+                    <X className="h-3 w-3" />
+                  </span>
+                </Badge>
+              ))
+            )}
+          </div>
+          <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50 ml-2" />
+        </Button>
+      </PopoverTrigger>
+
+      <PopoverContent
+        className="w-[--radix-popover-trigger-width] p-0 shad-select-content"
+        align="start"
+      >
+        <Command>
+          <CommandInput placeholder="Cari..." />
+          <CommandEmpty>Tidak ditemukan.</CommandEmpty>
+          <ScrollArea className="h-60">
+            {options.map((option) => {
+              const isSelected = value.includes(option.value);
+              const isDisabled =
+                !isSelected && !!maxSelect && value.length >= maxSelect;
+
+              return (
+                <CommandItem
+                  key={option.value}
+                  value={option.value}
+                  disabled={isDisabled}
+                  onSelect={() => toggle(option.value)}
+                  className={isDisabled ? "opacity-40 cursor-not-allowed" : ""}
+                >
+                  <div
+                    className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary ${
+                      isSelected
+                        ? "bg-primary text-primary-foreground"
+                        : "opacity-50 [&_svg]:invisible"
+                    }`}
+                  >
+                    <Check className="h-3 w-3" />
+                  </div>
+                  {option.label}
+                </CommandItem>
+              );
+            })}
+          </ScrollArea>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  );
+};
+
+// ─── RenderInput ──────────────────────────────────────────────────────────────
 type RenderInputProps = {
   field: any;
   props: CustomProps;
@@ -188,7 +335,6 @@ const RenderInput = ({ field, props, type }: RenderInputProps) => {
             <SelectTrigger className="w-full">
               <SelectValue placeholder={props.placeholder} />
             </SelectTrigger>
-
             <SelectContent className="shad-select-content">
               {props.children}
             </SelectContent>
@@ -224,11 +370,27 @@ const RenderInput = ({ field, props, type }: RenderInputProps) => {
     case FormFieldType.SKELETON:
       return props.renderSkeleton ? props.renderSkeleton(field) : null;
 
+    // ─── MULTISELECT ────────────────────────────────────────────────────────
+    case FormFieldType.MULTISELECT:
+      return (
+        <FormControl>
+          <MultiSelectInput
+            options={props.options ?? []}
+            value={field.value ?? []}
+            onChange={field.onChange}
+            placeholder={props.placeholder}
+            disabled={props.disabled}
+            maxSelect={props.maxSelect}
+          />
+        </FormControl>
+      );
+
     default:
       return null;
   }
 };
 
+// ─── CustomFormField ──────────────────────────────────────────────────────────
 export const CustomFormField = (props: CustomProps) => {
   const { control, name, label } = props;
 
@@ -244,7 +406,6 @@ export const CustomFormField = (props: CustomProps) => {
               <FormLabel className="shad-input-label">{label}</FormLabel>
             )}
           <RenderInput field={field} type={props.type} props={props} />
-
           <FormMessage className="shad-error" />
         </FormItem>
       )}

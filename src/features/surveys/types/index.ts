@@ -89,10 +89,10 @@ export const statusJtEnum = [
 export const buildFilterSchema = (statusEnum: string[]) =>
   z.object({
     statusJt: z
-      .string()
+      .array(z.string())
       .optional()
-      .refine((val) => !val || statusEnum.includes(val), {
-        message: "",
+      .refine((val) => !val || val.every((v) => statusEnum.includes(v)), {
+        message: "Status tidak valid",
       }),
     rabHldMin: z.string().optional(),
     rabHldMax: z.string().optional(),
@@ -101,7 +101,7 @@ export const buildFilterSchema = (statusEnum: string[]) =>
   });
 
 export type Filter = {
-  statusJt?: string;
+  statusJt?: string[];
   rabHldMin?: string;
   rabHldMax?: string;
   tahun?: string | null;

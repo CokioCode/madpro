@@ -9,9 +9,8 @@ const page = () => {
   });
 
   const enumsStatusRaw = data?.data?.statusJt ?? [];
-  const enumsStatus = ["ALL", ...enumsStatusRaw];
 
-  return <SurveyPage statusJtEnum={enumsStatus} />;
+  return <SurveyPage statusJtEnum={enumsStatusRaw} />;
 };
 
 export default page;
