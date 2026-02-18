@@ -27,7 +27,7 @@ export const SurveyPage = (props: SurveyProps) => {
   const [filters, setFilters] = useState<Filter>({
     rabHldMin: "",
     rabHldMax: "",
-    statusJt: "ALL",
+    statusJt: [],
     sto: "",
     tahun: "",
   });
@@ -50,7 +50,10 @@ export const SurveyPage = (props: SurveyProps) => {
     params.append("limit", pagination.pageSize.toString());
     params.append("search", pagination.searchQuery);
 
-    if (filters.statusJt) params.append("statusJt", filters.statusJt);
+    if (filters.statusJt && filters.statusJt.length > 0) {
+      params.append("statusJt", filters.statusJt.join(","));
+    }
+
     if (filters.rabHldMin) params.append("rabHldMin", filters.rabHldMin);
     if (filters.rabHldMax) params.append("rabHldMax", filters.rabHldMax);
     if (filters.sto) params.append("sto", filters.sto);
