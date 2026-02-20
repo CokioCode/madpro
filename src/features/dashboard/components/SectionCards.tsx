@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGet } from "@/hooks/useApi";
-import { cn } from "@/lib/utils";
+import { cn, decodeJwt, getCookie } from "@/lib/utils";
 
 type StatsData = {
   totalSurvey: number;
@@ -145,8 +145,16 @@ export function SectionCards({ hariTerakhir }: SectionCardsProps) {
   const goLivePercentage =
     totalSurvey > 0 ? (totalGoLive / totalSurvey) * 100 : 0;
 
-  const baseUrl = "/admin/surveys";
+  const token = getCookie("token");
+  const decoded = decodeJwt<{
+    userId: string;
+    username: string;
+    role: "ADMIN" | "USER";
+    iat: number;
+    exp: number;
+  }>(token);
 
+  const baseUrl = `/${decoded?.role.toLowerCase()}/surveys`;
   const stats = [
     {
       title: "Total Surveys",

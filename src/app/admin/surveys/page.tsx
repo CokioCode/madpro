@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { SurveyPage } from "@/features/surveys/pages/SurveysPage";
 import { useGet } from "@/hooks/useApi";
 
@@ -10,7 +11,11 @@ const page = () => {
 
   const enumsStatusRaw = data?.data?.statusJt ?? [];
 
-  return <SurveyPage statusJtEnum={enumsStatusRaw} />;
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SurveyPage statusJtEnum={enumsStatusRaw} />
+    </Suspense>
+  );
 };
 
 export default page;
