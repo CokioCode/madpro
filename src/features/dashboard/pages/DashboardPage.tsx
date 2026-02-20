@@ -13,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useGet } from "@/hooks/useApi";
 import { SectionCards } from "@/features/dashboard/components/SectionCards";
 import { filterDashSchema } from "../types";
 
@@ -24,6 +25,9 @@ export const DashboardPage = () => {
       hariTerakhir: "30",
     },
   });
+
+  const { data: enumsData } = useGet(["enums"], "/enums", { isAuth: true });
+  const statusJtEnum: string[] = enumsData?.data?.statusJt ?? [];
 
   const handleSubmit = async () => {};
 

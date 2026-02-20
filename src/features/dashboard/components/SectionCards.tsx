@@ -6,6 +6,7 @@ import {
   Loader2,
   TrendingUp,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -27,6 +28,7 @@ type ApiResponse = {
 
 interface SectionCardsProps {
   hariTerakhir: number;
+  statusJtEnum?: string[];
 }
 
 interface StatCardProps {
@@ -39,6 +41,7 @@ interface StatCardProps {
   isLoading?: boolean;
   progress?: number;
   showProgress?: boolean;
+  href?: string;
 }
 
 function StatCard({
@@ -51,7 +54,10 @@ function StatCard({
   isLoading = false,
   progress,
   showProgress = false,
+  href,
 }: StatCardProps) {
+  const router = useRouter();
+
   if (isLoading) {
     return (
       <Card>
@@ -68,8 +74,23 @@ function StatCard({
     );
   }
 
+  const handleClick = () => {
+    if (href) router.push(href);
+  };
+
   return (
-    <Card className="group hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer overflow-hidden">
+    <Card
+      className={cn(
+        "group hover:shadow-lg hover:-translate-y-1 transition-all duration-200 overflow-hidden",
+        href && "cursor-pointer",
+      )}
+      onClick={handleClick}
+      role={href ? "button" : undefined}
+      tabIndex={href ? 0 : undefined}
+      onKeyDown={(e) => {
+        if (href && (e.key === "Enter" || e.key === " ")) handleClick();
+      }}
+    >
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-sm font-medium text-muted-foreground">
           {title}
@@ -97,6 +118,11 @@ function StatCard({
             </p>
           </div>
         )}
+        {href && (
+          <p className="text-xs text-primary font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            Lihat data →
+          </p>
+        )}
       </CardContent>
     </Card>
   );
@@ -119,6 +145,8 @@ export function SectionCards({ hariTerakhir }: SectionCardsProps) {
   const goLivePercentage =
     totalSurvey > 0 ? (totalGoLive / totalSurvey) * 100 : 0;
 
+  const baseUrl = "/admin/surveys";
+
   const stats = [
     {
       title: "Total Surveys",
@@ -128,6 +156,7 @@ export function SectionCards({ hariTerakhir }: SectionCardsProps) {
       iconColor: "text-blue-600",
       iconBgColor: "bg-blue-100",
       showProgress: false,
+      href: `${baseUrl}?hariTerakhir=${hariTerakhir}`,
     },
     {
       title: "Pending Review",
@@ -138,6 +167,7 @@ export function SectionCards({ hariTerakhir }: SectionCardsProps) {
       iconBgColor: "bg-orange-100",
       progress: pendingPercentage,
       showProgress: true,
+      href: `${baseUrl}?statusUsulanNot=GOLIVE&statusUsulanNot=APPROVE&statusUsulanNot=CANCEL_PELANGGAN&hariTerakhir=${hariTerakhir}`,
     },
     {
       title: "Sudah Go Live",
@@ -148,6 +178,7 @@ export function SectionCards({ hariTerakhir }: SectionCardsProps) {
       iconBgColor: "bg-green-100",
       progress: goLivePercentage,
       showProgress: true,
+      href: `${baseUrl}?statusJt=GOLIVE&hariTerakhir=${hariTerakhir}`,
     },
     {
       title: "Approval Rate",
@@ -163,6 +194,7 @@ export function SectionCards({ hariTerakhir }: SectionCardsProps) {
       iconBgColor: approvalRate >= 50 ? "bg-green-100" : "bg-orange-100",
       progress: approvalRate,
       showProgress: true,
+      href: `${baseUrl}?statusJt=APPROVE&hariTerakhir=${hariTerakhir}`,
     },
   ];
 

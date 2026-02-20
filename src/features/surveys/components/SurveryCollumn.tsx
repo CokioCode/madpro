@@ -134,6 +134,26 @@ export const createSurveyColumns = (
     size: 120,
   },
   {
+    accessorKey: "c2r",
+    header: "C2R",
+    cell: ({ row }) => (
+      <div className="text-sm text-slate-900 min-w-[80px] max-w-[100px] truncate">
+        {`${row.original.c2r}%` || "-"}
+      </div>
+    ),
+    size: 100,
+  },
+  {
+    accessorKey: "nilaiKontrak",
+    header: "Nilai Kontrak",
+    cell: ({ row }) => (
+      <div className="text-sm font-medium text-slate-900 min-w-[110px]">
+        {formatCurrency(Number(row.original.nilaiKontrak))}
+      </div>
+    ),
+    size: 130,
+  },
+  {
     accessorKey: "rabHldSummary",
     header: "RAB HLD",
     cell: ({ row }) => (

@@ -1,4 +1,5 @@
 "use client";
+
 import {
   type ColumnDef,
   flexRender,
@@ -53,6 +54,7 @@ interface DataTableProps<TData, TValue> {
   onPageChange?: (page: number) => void;
   onPageSizeChange?: (pageSize: number) => void;
   onFilterChange?: (filters: Filter) => void;
+  initialFilters?: Filter;
   disabled?: boolean;
   isAdmin?: boolean;
   statusJtEnum?: string[];
@@ -74,6 +76,7 @@ export function DataTable<TData, TValue>({
   onPageChange,
   onPageSizeChange,
   onFilterChange,
+  initialFilters,
   disabled,
   isAdmin,
   statusJtEnum,
@@ -132,6 +135,7 @@ export function DataTable<TData, TValue>({
             <FilterDrawer
               onFilterChange={onFilterChange}
               statusJtEnum={statusJtEnum ?? []}
+              initialFilters={initialFilters}
             />
           )}
           {mounted && onCreateClick && isAdmin && (

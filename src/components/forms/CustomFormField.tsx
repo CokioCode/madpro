@@ -21,11 +21,9 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Command,
   CommandEmpty,
-  CommandGroup,
   CommandInput,
   CommandItem,
 } from "@/components/ui/command";
@@ -48,10 +46,10 @@ export enum FormFieldType {
   SKELETON = "skeleton",
   RANGE_SLIDER = "rangeSlider",
   HIDDEN = "hidden",
-  MULTISELECT = "multiselect", // ← baru
+  MULTISELECT = "multiselect",
+  DATE_RANGE = "dateRange",
 }
 
-// ─── MultiSelect option type ──────────────────────────────────────────────────
 export interface MultiSelectOption {
   value: string;
   label: string;
@@ -79,12 +77,12 @@ interface CustomProps {
   step?: number;
   formatLabel?: (value: number | undefined) => string;
 
-  // MultiSelect props
   options?: MultiSelectOption[];
   maxSelect?: number;
+  startDate?: Date | null;
+  endDate?: Date | null;
 }
 
-// ─── MultiSelect Internal Component ──────────────────────────────────────────
 interface MultiSelectInputProps {
   options: MultiSelectOption[];
   value: string[];
@@ -113,23 +111,24 @@ const MultiSelectInput = ({
     }
   };
 
-  const remove = (val: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    onChange(value.filter((v) => v !== val));
-  };
-
   const selectedOptions = options.filter((o) => value.includes(o.value));
 
   return (
     <Popover open={open} onOpenChange={disabled ? undefined : setOpen}>
       <PopoverTrigger asChild>
-        <Button
-          type="button"
-          variant="outline"
+        <div
           role="combobox"
           aria-expanded={open}
-          disabled={disabled}
-          className="shad-input w-full justify-between h-auto min-h-10 font-normal border-dark-500 bg-dark-400 text-left"
+          aria-disabled={disabled}
+          onClick={() => !disabled && setOpen(!open)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              if (!disabled) setOpen(!open);
+            }
+          }}
+          tabIndex={disabled ? -1 : 0}
+          className="shad-input w-full flex justify-between h-auto min-h-10 font-normal border border-dark-500 bg-dark-400 text-left rounded-md px-3 py-2 cursor-pointer"
         >
           <div className="flex flex-wrap gap-1 flex-1">
             {selectedOptions.length === 0 ? (
@@ -142,26 +141,24 @@ const MultiSelectInput = ({
                   className="flex items-center gap-1 pr-1"
                 >
                   {item.label}
-                  <span
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter")
-                        remove(item.value, e as unknown as React.MouseEvent);
+                  <button
+                    type="button"
+                    onPointerDown={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onChange(value.filter((v) => v !== item.value));
                     }}
-                    onClick={(e) => remove(item.value, e)}
                     className="ml-1 rounded-full hover:bg-muted-foreground/20 p-0.5 cursor-pointer"
                   >
                     <X className="h-3 w-3" />
-                  </span>
+                  </button>
                 </Badge>
               ))
             )}
           </div>
-          <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50 ml-2" />
-        </Button>
+          <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50 ml-2 self-center" />
+        </div>
       </PopoverTrigger>
-
       <PopoverContent
         className="w-[--radix-popover-trigger-width] p-0 shad-select-content"
         align="start"
@@ -203,7 +200,6 @@ const MultiSelectInput = ({
   );
 };
 
-// ─── RenderInput ──────────────────────────────────────────────────────────────
 type RenderInputProps = {
   field: any;
   props: CustomProps;
@@ -238,6 +234,42 @@ const RenderInput = ({ field, props, type }: RenderInputProps) => {
         </div>
       );
 
+    case FormFieldType.DATE_RANGE: {
+      const [start, end] = (field.value as [Date | null, Date | null]) ?? [
+        null,
+        null,
+      ];
+
+      return (
+        <div className="flex rounded-md border border-dark-500 bg-dark-400 items-center px-3 gap-2 h-11">
+          <FormControl>
+            <ReactDatePicker
+              selectsRange
+              startDate={start}
+              endDate={end}
+              onChange={(dates: [Date | null, Date | null]) =>
+                field.onChange(dates)
+              }
+              dateFormat="dd MMM yyyy"
+              placeholderText={props.placeholder ?? "Pilih rentang tanggal"}
+              wrapperClassName="flex-1"
+              className="bg-transparent text-sm text-black w-full outline-none cursor-pointer placeholder:text-gray-500 caret-transparent"
+              disabled={props.disabled}
+            />
+          </FormControl>
+
+          {(start || end) && (
+            <button
+              type="button"
+              onClick={() => field.onChange([null, null])}
+              className="shrink-0 rounded-full p-1 hover:bg-dark-500 transition-colors"
+            >
+              <X className="h-3.5 w-3.5 text-gray-400 hover:text-white" />
+            </button>
+          )}
+        </div>
+      );
+    }
     case FormFieldType.PASSWORD:
       return (
         <div className="relative flex rounded-md border border-dark-500 bg-dark-400">

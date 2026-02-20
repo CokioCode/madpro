@@ -1,7 +1,8 @@
 "use client";
 
 import { RefreshCw } from "lucide-react";
-import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { DeleteDialog } from "@/components/dialog/DeleteDialog";
 import { DataTable } from "@/components/table/DataTable";
@@ -19,18 +20,41 @@ interface SurveyProps {
 }
 
 export const SurveyPage = (props: SurveyProps) => {
+  const searchParams = useSearchParams();
+
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
   const [selectedSurvey, setSelectedSurvey] = useState<Survey | null>(null);
 
-  const [filters, setFilters] = useState<Filter>({
-    rabHldMin: "",
-    rabHldMax: "",
-    statusJt: [],
-    sto: "",
-    tahun: "",
+  const [filters, setFilters] = useState<Filter>(() => {
+    const statusJtParam = searchParams.get("statusJt");
+    const hariTerakhirParam = searchParams.get("hariTerakhir");
+    const statusNo = searchParams.getAll("statusUsulanNot");
+
+    return {
+      rabHldMin: "",
+      rabHldMax: "",
+      statusJt: statusJtParam ? [statusJtParam] : [],
+      hariTerakhir: hariTerakhirParam ?? "",
+      statusUsulanNot: statusNo,
+      sto: "",
+      dateRange: undefined,
+    };
   });
+
+  useEffect(() => {
+    const statusJtParam = searchParams.get("statusJt");
+    const hariTerakhirParam = searchParams.get("hariTerakhir");
+    const statusNo = searchParams.getAll("statusUsulanNot");
+
+    setFilters((prev) => ({
+      ...prev,
+      hariTerakhir: hariTerakhirParam ?? "",
+      statusJt: statusJtParam ? [statusJtParam] : [],
+      statusUsulanNot: statusNo,
+    }));
+  }, [searchParams]);
 
   const token = getCookie("token");
   const decoded = decodeJwt<{
@@ -54,10 +78,21 @@ export const SurveyPage = (props: SurveyProps) => {
       params.append("statusJt", filters.statusJt.join(","));
     }
 
+    if (filters.hariTerakhir)
+      params.append("hariTerakhir", filters.hariTerakhir);
+    if (filters.statusUsulanNot?.length) {
+      filters.statusUsulanNot.forEach((v) => {
+        params.append("statusUsulanNot", v);
+      });
+    }
     if (filters.rabHldMin) params.append("rabHldMin", filters.rabHldMin);
     if (filters.rabHldMax) params.append("rabHldMax", filters.rabHldMax);
     if (filters.sto) params.append("sto", filters.sto);
-    if (filters.tahun) params.append("tahun", filters.tahun);
+    if (filters.dateRange?.[0] && filters.dateRange?.[1]) {
+      const start = filters.dateRange[0].toLocaleDateString("sv-SE");
+      const end = filters.dateRange[1].toLocaleDateString("sv-SE");
+      params.append("dateRange", `${start},${end}`);
+    }
 
     return params.toString();
   };
@@ -196,6 +231,7 @@ export const SurveyPage = (props: SurveyProps) => {
         onFilterChange={handleFilterChange}
         onCreateClick={handleSync}
         statusJtEnum={props.statusJtEnum}
+        initialFilters={filters}
         createButtonText={
           syncSurveyMutation.isPending ? (
             <RefreshCw className="animate-spin" />

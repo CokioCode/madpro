@@ -26,10 +26,11 @@ import { buildFilterSchema, type Filter } from "../types";
 interface FilterDrawerProps {
   onFilterChange?: (filters: Filter) => void;
   statusJtEnum: string[];
+  initialFilters?: Filter;
 }
 
 export const FilterDrawer = (props: FilterDrawerProps) => {
-  const { onFilterChange } = props;
+  const { onFilterChange, initialFilters } = props;
   const [selectedRange, setSelectedRange] = useState<number | null>(null);
   const [showCustomRange, setShowCustomRange] = useState(false);
 
@@ -37,10 +38,13 @@ export const FilterDrawer = (props: FilterDrawerProps) => {
     resolver: zodResolver(buildFilterSchema(props.statusJtEnum)),
     mode: "onChange",
     defaultValues: {
-      rabHldMin: "",
-      rabHldMax: "",
-      sto: "",
-      tahun: "",
+      rabHldMin: initialFilters?.rabHldMin ?? "",
+      rabHldMax: initialFilters?.rabHldMax ?? "",
+      statusJt: initialFilters?.statusJt ?? [],
+      sto: initialFilters?.sto ?? "",
+      hariTerakhir: initialFilters?.hariTerakhir ?? "",
+      statusUsulanNot: initialFilters?.statusUsulanNot,
+      dateRange: initialFilters?.dateRange ?? undefined,
     },
   });
 
@@ -53,8 +57,7 @@ export const FilterDrawer = (props: FilterDrawerProps) => {
       rabHldMin: "",
       rabHldMax: "",
       statusJt: [],
-      sto: "",
-      tahun: "",
+      dateRange: undefined,
     };
 
     form.reset(emptyFilter);
@@ -77,11 +80,23 @@ export const FilterDrawer = (props: FilterDrawerProps) => {
     setShowCustomRange(true);
   };
 
+  const activeFilterCount = [
+    (form.watch("statusJt") ?? []).length > 0,
+    !!form.watch("rabHldMin") || !!form.watch("rabHldMax"),
+    !!form.watch("sto"),
+    !!form.watch("dateRange"),
+  ].filter(Boolean).length;
+
   return (
     <Drawer direction="right">
       <DrawerTrigger asChild>
-        <Button variant="outline" size="default" className="gap-2">
+        <Button variant="outline" size="default" className="gap-2 relative">
           <FilterIcon className="h-4 w-4" />
+          {activeFilterCount > 0 && (
+            <span className="absolute -top-1.5 -right-1.5 h-4 w-4 rounded-full bg-primary text-primary-foreground text-[10px] font-semibold flex items-center justify-center">
+              {activeFilterCount}
+            </span>
+          )}
         </Button>
       </DrawerTrigger>
 
@@ -198,10 +213,11 @@ export const FilterDrawer = (props: FilterDrawerProps) => {
 
               <CustomFormField
                 control={form.control}
-                name="tahun"
-                fieldType={FormFieldType.INPUT}
-                label="Tahun"
-                placeholder="Contoh: 2024"
+                fieldType={FormFieldType.DATE_RANGE}
+                name="dateRange"
+                label="Rentang Tanggal"
+                placeholder="Pilih rentang tanggal"
+                dateFormat="dd/MM/yyyy"
               />
             </form>
           </Form>

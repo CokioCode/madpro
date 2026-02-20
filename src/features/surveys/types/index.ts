@@ -94,18 +94,30 @@ export const buildFilterSchema = (statusEnum: string[]) =>
       .refine((val) => !val || val.every((v) => statusEnum.includes(v)), {
         message: "Status tidak valid",
       }),
+
     rabHldMin: z.string().optional(),
     rabHldMax: z.string().optional(),
-    tahun: z.string().optional().nullable(),
     sto: z.string().optional(),
+    hariTerakhir: z.string().optional(),
+
+    statusUsulanNot: z
+      .array(z.string())
+      .optional()
+      .refine((val) => !val || val.every((v) => statusEnum.includes(v)), {
+        message: "Status tidak valid",
+      }),
+
+    dateRange: z.tuple([z.date().nullable(), z.date().nullable()]).optional(),
   });
 
 export type Filter = {
   statusJt?: string[];
   rabHldMin?: string;
   rabHldMax?: string;
-  tahun?: string | null;
   sto?: string;
+  hariTerakhir?: string;
+  statusUsulanNot?: string[];
+  dateRange?: [Date | null, Date | null];
 };
 
 export const surveySchema = z.object({
