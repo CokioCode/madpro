@@ -167,11 +167,11 @@ export const createSurveySchema = z.object({
   alamat: z.string().optional(),
   jenisLayanan: z.string().optional(),
   nilaiKontrak: z.string().optional(),
-  rabSurvey: z.number().optional(),
+  rabSurvey: z.coerce.number().optional(),
   noNde: z.string().optional(),
   progresJt: z.string().optional(),
   namaOdp: z.string().optional(),
-  jarakOdp: z.number().optional(),
+  jarakOdp: z.coerce.number().optional(),
   keteranganText: z.string().optional(),
 });
 

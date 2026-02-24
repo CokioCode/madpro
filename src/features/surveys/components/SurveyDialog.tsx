@@ -38,7 +38,8 @@ export const SurveyDialog = ({
   statusJtEnum,
 }: SurveyDialogProps) => {
   const form = useForm<UpdateSurvey>({
-    resolver: zodResolver(updateSurveySchema),
+    resolver: zodResolver(updateSurveySchema as any),
+    mode: "onChange",
     defaultValues: {
       statusJt: "",
       nomorNcx: "",
