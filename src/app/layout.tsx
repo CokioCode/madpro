@@ -4,6 +4,7 @@ import "./globals.css";
 import { QueryProvider } from "@/components/layout/QueryProvider";
 import { Toaster } from "@/components/ui/sonner";
 import "react-datepicker/dist/react-datepicker.css";
+import { AudioPlayer } from "@/components/layout/AudioPlayer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,6 +39,7 @@ export default function RootLayout({
             theme="light"
             className="bg-primary"
           />
+          <AudioPlayer />
         </QueryProvider>
       </body>
     </html>
